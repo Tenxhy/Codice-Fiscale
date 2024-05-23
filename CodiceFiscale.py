@@ -1,10 +1,11 @@
 import datetime
 from datetime import datetime
-
 import pandas as pd
-comuni = pd.read_excel(r".\Elenco-comuni-italiani.xlsx", header=None)
+from CalcoloCodice import CalcoloCodice
+
+comuni = pd.read_excel(r".\data\Elenco-comuni-italiani.xlsx", header=None)
 comuniDict = comuni.to_dict()
-checkdigit = pd.read_excel(r".\CheckDigitDatabase.xlsx", header=None)
+checkdigit = pd.read_excel(r".\data\CheckDigitDatabase.xlsx", header=None)
 checkDict = checkdigit.to_dict()
 
 print("""
@@ -102,111 +103,12 @@ while check == 0:
     check = 0
 
 
-#Componente Cognome
+#Calcolo del codice fiscale
 
-compcogn = ""
-for  i in cognome:
-  if not(i == "A" or i == "E" or i == "I" or i == "O" or i == "U"):
-    compcogn = compcogn+i
+calcolo = CalcoloCodice(comuniDict, checkDict)
 
-for  i in cognome:
-  if i == "A" or i == "E" or i == "I" or i == "O" or i == "U":
-    compcogn = compcogn+i
+codice = calcolo.calcola(nome, cognome, sesso, giorno, mese, anno, luogo)
 
-compcogn = compcogn+"XXX"
-comp1 = compcogn[:3]
-
-#Componente Nome
-
-compnom = ""
-check = 0
-for  i in nome:
-  if not(i == "A" or i == "E" or i == "I" or i == "O" or i == "U"):
-    compnom = compnom+i
-
-if len(compnom)<4:
-  for  i in nome:
-    if i == "A" or i == "E" or i == "I" or i == "O" or i == "U":
-      compnom = compnom+i
-
-  check = 1
-  compnom = compnom+"XXX"
-
-if check == 0:
-  comp2 = compnom[:1]+compnom[2:4]
-else:
-  comp2 = compnom[:3]
-
-#Componente Data di Nascita
-
-if sesso == "M":
-  compgiorno = giorno
-else:
-  compgiorno = str(int(giorno)+40)
-
-compmese = ""
-
-if mese == 1:
-  compmese = "A"
-elif mese == 2:
-  compmese = "B"
-elif mese == 3:
-  compmese = "C"
-elif mese == 4:
-  compmese = "D"
-elif mese == 5:
-  compmese = "E"
-elif mese == 6:
-  compmese = "H"
-elif mese == 7:
-  compmese = "L"
-elif mese == 8:
-  compmese = "M"
-elif mese == 9:
-  compmese = "P"
-elif mese == 10:
-  compmese = "R"
-elif mese == 11:
-  compmese = "S"
-elif mese == 12:
-  compmese = "T"
-
-companno = str(anno[2:])
-
-comp3 = companno+compmese+compgiorno
-
-#Componente Luogo
-
-compluogoNum = [value for value, nomeLuogo in comuniDict[0].items() if nomeLuogo == luogo][0]
-
-comp4 = comuniDict[1][compluogoNum]
-
-#Concatenazione delle componenti
-
-codice = comp1+comp2+comp3+comp4
-
-#Componente Check Digit
-
-compcheckNum = int()
-compSomma = int()
-nomeChar = ""
-tot = 0
-
-for c in codice:
-  tot = tot+1
-  nomeChar = c
-  if tot%2 != 0:
-    compcheckNum = int([value for value, nomeChar in checkDict[2].items() if nomeChar == c][0])
-    compSomma = compSomma+checkDict[3][compcheckNum]
-  else:
-    compcheckNum = int([value for value, nomeChar in checkDict[0].items() if nomeChar == c][0])
-    compSomma = compSomma+checkDict[1][compcheckNum]
-
-compSomma = compSomma%26
-comp5 = checkDict[5][compSomma]
-
-#Codice Fiscale
-
-codice = codice+comp5
-
-print(f"Il suo codice fiscale è {codice}")
+print("#")
+print(f"# Il suo codice fiscale è {codice}")
+print("#")
