@@ -8,7 +8,7 @@ Utilizzando algoritmi specifici, il programma elabora informazioni come nome, co
 1. Assicurati di avere Python installato sul tuo sistema.
 2. Apri il terminale o la finestra del prompt dei comandi.
 3. Clona la repository GitHub utilizzando il seguente comando:
-`git clone https://github.com/Tenxhy/Codice-Fiscale'
+`git clone https://github.com/Tenxhy/Codice-Fiscale`
 
 4. Naviga nella directory (cartella) del progetto clonata:
 `cd Codice-Fiscale`
