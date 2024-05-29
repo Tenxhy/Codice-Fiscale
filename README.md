@@ -5,11 +5,16 @@ Utilizzando algoritmi specifici, il programma elabora informazioni come nome, co
 
 ## Per avviare lo script, segui questi passaggi:
 
-1. Assicurati di avere Python installato sul tuo sistema
-2. Apri il terminale o la finestra del prompt dei comandi
-3. Naviga nella directory (cartella) in cui si trova il file README.md dal terminale
-4. Installa i requisiti specificati nel file requirements.txt eseguendo il seguente comando:
-    `pip install -r requirements.txt`
-5. Una volta completata l'installazione dei requisiti, puoi eseguire lo script utilizzando il seguente comando:
-    `py ./CodiceFiscale.py`
+1. Assicurati di avere Python installato sul tuo sistema.
+2. Apri il terminale o la finestra del prompt dei comandi.
+3. Clona la repository GitHub utilizzando il seguente comando:
+`git clone https://github.com/Tenxhy/Codice-Fiscale'
 
+4. Naviga nella directory (cartella) del progetto clonata:
+`cd Codice-Fiscale`
+
+5. Installa i requisiti specificati nel file requirements.txt eseguendo il seguente comando:
+`pip install -r requirements.txt`
+
+6. Una volta completata l’installazione dei requisiti, puoi eseguire lo script utilizzando il seguente comando:
+`py ./CodiceFiscale.py`
