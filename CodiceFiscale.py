@@ -1,114 +1,66 @@
-import datetime
+import colorama
 from datetime import datetime
 import pandas as pd
 from CalcoloCodice import CalcoloCodice
+from ControlliInput import ControlliInput
 
 comuni = pd.read_excel(r".\data\Elenco-comuni-italiani.xlsx", header=None)
 comuniDict = comuni.to_dict()
 checkdigit = pd.read_excel(r".\data\CheckDigitDatabase.xlsx", header=None)
 checkDict = checkdigit.to_dict()
 
-print("""
-#################################################################
-#\t\t    CALCOLO CODICE FISCALE     \t\t\t#
+def main() -> None:
+
+  print(f"""
+  #################################################################
+#\t\t    {str(colorama.Fore.CYAN)}CALCOLO CODICE FISCALE{str(colorama.Style.RESET_ALL)}     \t\t\t#
 #################################################################""".strip())
-print("#")
+  print("#")
 
-#Richiesta del cognome e verifica della sua validità
+  # Richiesta del cognome e verifica della sua validità
+  cognome = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire un cognome valido:  " + colorama.Style.RESET_ALL).strip().upper()
+  while not ControlliInput.check_parola(cognome):
+    print("# " + colorama.Fore.RED + "Il cognome può contenere solo lettere" + colorama.Style.RESET_ALL)
+    cognome = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire un cognome valido:  " + colorama.Style.RESET_ALL).strip().upper()
 
-check = 0
-cognome = ""
-while check == 0:
-  cognome = input("# Inserisca un cognome valido  ").strip().upper()
-  check = 1
-  for i in cognome:
-    if not (ord(i) >= 65 and ord(i) <= 90 or ord(i) == 32):
-      check = 0
+  # Richiesta del nome e verifica della sua validità
+  nome = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire un nome valido:  " + colorama.Style.RESET_ALL).strip().upper()
+  while not ControlliInput.check_parola(nome):
+    print("# " + colorama.Fore.RED + "Il nome può contenere solo lettere" + colorama.Style.RESET_ALL)
+    nome = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire un nome valido:  " + colorama.Style.RESET_ALL).strip().upper()
 
-#Richiesta del nome e verifica della sua validità
+  # Richiesta della data di nascita e verifica della sua validità
+  data = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire una data valida con format GG/MM/AAAA:  " + colorama.Style.RESET_ALL)
+  while not ControlliInput.check_data(data):
+    data_minima = datetime.now().year - 130
+    print("# " + colorama.Fore.RED + f"La data deve corrispondere al formato GG/MM/AAAA e deve essere compresa tra il {data_minima} e oggi" + colorama.Style.RESET_ALL)
+    data = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire una data valida con format GG/MM/AAAA:  " + colorama.Style.RESET_ALL)
 
-check = 0
-nome = ""
-while check == 0:
-  nome = input("# Inserisca un nome valido  ").strip().upper()
-  check = 1
-  for i in nome:
-    if not ((ord(i) >= 65 and ord(i) <= 90) or (ord(i) == 32)):
-      check = 0
+  anno = str(data[-4:])
+  mese = int(data[3:5])
+  giorno = str(data[:2])
 
-#Richiesta della data di nascita e verifica della sua validità
+  # Richiesta del luogo di nascita e verifica della sua validità
+  luogo = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire il luogo di nascita:  " + colorama.Style.RESET_ALL)
+  while not ControlliInput.check_luogo(luogo, comuni):
+    print("# " + colorama.Fore.RED + "Il luogo di nascita non è valido" + colorama.Style.RESET_ALL)
+    luogo = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire il luogo di nascita:  " + colorama.Style.RESET_ALL)
 
-check = 0
-data = ""
-while check == 0:
-  data = input("# Inserisca una data valida con format GG/MM/AAAA  ")
-  check = 1
-  if len(data) == 10:
-    for i in data:
-      if not (ord(i) >= 47 and ord(i) <= 57):
-        check = 0
+  # Richiesta del sesso e verifica della sua validità
+  sesso = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire il sesso, M o F:  " + colorama.Style.RESET_ALL).strip().upper()
+  while not ControlliInput.check_sesso(sesso):
+    print("# " + colorama.Fore.RED + "Il sesso può essere solo M o F" + colorama.Style.RESET_ALL)
+    sesso = input("# " + colorama.Fore.LIGHTBLUE_EX + "Inserire il sesso, M o F:  " + colorama.Style.RESET_ALL).strip().upper()
 
-    if data[2] != "/" or data[5] != "/":
-      check = 0
-    else:
-      anno_attuale = datetime.now().year
-      mese_attuale = datetime.now().month
-      giorno_attuale = datetime.now().day
-      anno = int(data[-4:])
-      mese = int(data[3:5])
-      giorno = int(data[:2])
+  # Calcolo del codice fiscale
+  calcolo = CalcoloCodice(comuniDict, checkDict)
+  codice = calcolo.calcola(nome, cognome, sesso, giorno, mese, anno, luogo)
 
-      if anno <= 1900 or (mese > mese_attuale and anno > anno_attuale and giorno > giorno_attuale):
-        check = 0
-      elif mese < 1 or mese > 12:
-        check = 0
-      elif (mese == 1 or mese == 3 or mese == 5 or mese == 7 or mese == 8 or mese == 10 or mese == 12):
-        if giorno < 1 or giorno > 31:
-          check = 0
-      elif (mese == 4 or mese == 6 or mese == 9 or mese == 11):
-        if giorno < 1 or giorno > 30:
-          check = 0
-      elif (mese == 2):
-        if giorno < 1 or giorno >28:
-          check = 0
-        if anno%4==0 and (anno%100!=0 or anno%400==0):
-          if mese == 2 and (giorno >= 1 or giorno <= 29):
-            check = 1
-  else:
-    check = 0
+  print("#")
+  print("# " + colorama.Fore.GREEN + "Il suo codice fiscale è " + colorama.Fore.YELLOW + f"{codice}" + colorama.Style.RESET_ALL)
+  print("#")
+  print("#################################################################")
+  input("Premere INVIO per uscire...")
 
-anno = str(data[-4:])
-mese = int(data[3:5])
-giorno = str(data[:2])
-
-#Richiesta del luogo di nascita e verifica della sua validità
-
-check = 0
-luogo = ""
-while check == 0:
-  luogo = input("# Inserisca il luogo di nascita  ")
-  check = 1
-  trovato = luogo in comuni[0].values
-  if not trovato:
-    check = 0
-
-#Richiesta del sesso e verifica della sua validità
-
-check = 0
-sesso = ""
-while check == 0:
-  sesso = input("# Inserisca il sesso, M o F  ").strip().upper()
-  check = 1
-  if sesso != "M" and sesso != "F":
-    check = 0
-
-
-#Calcolo del codice fiscale
-
-calcolo = CalcoloCodice(comuniDict, checkDict)
-
-codice = calcolo.calcola(nome, cognome, sesso, giorno, mese, anno, luogo)
-
-print("#")
-print(f"# Il suo codice fiscale è {codice}")
-print("#")
+if __name__ == "__main__":
+  main()
